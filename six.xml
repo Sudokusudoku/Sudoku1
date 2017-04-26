@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <com.example.ssudoku.Square6View
+        android:id="@+id/drawView3"
+        android:layout_width="wrap_content"
+        android:layout_height="376dp" />
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:gravity="center_horizontal" >
+
+            <Button
+                android:id="@+id/button61"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/number1" />
+
+            <Button
+                android:id="@+id/button62"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/number2" />
+
+            <Button
+                android:id="@+id/button63"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/number3" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:gravity="center_horizontal" >
+
+            <Button
+                android:id="@+id/button64"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/number4" />
+
+            <Button
+                android:id="@+id/button65"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/number5" />
+
+            <Button
+                android:id="@+id/button66"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/number6" />
+        </TableRow>
+    </TableLayout>
+
+</LinearLayout>
