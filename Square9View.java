@@ -11,6 +11,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.MeasureSpec;
 
 
 
@@ -45,6 +46,28 @@ public class Square9View extends View{
 		System.out.print("hhhh");
 	}
 	 
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        setMeasuredDimension(   measureWidth(widthMeasureSpec), 
+        		measureWidth(widthMeasureSpec)+20);
+    }
+	 
+    private int measureWidth(int measureSpec) {    
+        int w = 0;
+
+        int specMode = MeasureSpec.getMode(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
+
+        if (specMode == MeasureSpec.EXACTLY) {   // match_parent , accurate
+            w = specSize;
+        } else {
+            w = 600;    
+            if (specMode == MeasureSpec.AT_MOST) {  // wrap_content 
+               w = Math.min(w,specSize); 
+           }
+        }
+        return w;
+    }
+    
 	 public void onDraw(Canvas canvas){
 		 
 		 
@@ -82,6 +105,9 @@ public class Square9View extends View{
 		 }
 		
 		 //draw initial numbers
+		 Paint iniBackPaint=new Paint();
+		 iniBackPaint.setColor(Color.argb(85,107,47,0));
+		 iniBackPaint.setAlpha(30);
 		 Paint number=new Paint();
 		 number.setColor(Color.BLACK);
 		 number.setTextSize(hight/2);
@@ -92,50 +118,55 @@ public class Square9View extends View{
 		 
 		 for(int i=0;i<9;i++){
 			for(int j=0;j<9;j++){
+				if( game.now[i][j]>0 && game.now[i][j]<10)
+					canvas.drawRect((int)(14+i*width), (int)(11+j*hight), (int)(12+(i+1)*width),(int)(10+(j+1)*hight),iniBackPaint);				
 				canvas.drawText(game.getString(i, j),i*width+x,j*hight+y,number);
 			}
 		 }
 		 
-		 //draw selected area
+		//draw selected area
 		 Paint selected = new Paint();
-	 	 selected.setColor(Color.CYAN);
-	 	 selected.setStrokeWidth(6);
+	 	 selected.setColor(Color.argb(107,142,35,0));
+	 	 selected.setStrokeWidth(10);
 	 	 selected.setStyle(Paint.Style.STROKE); 
-	 	 if(!game.isOriginal(selectX, selectY)){
-	 		  canvas.drawRect(selectRect, selected);
-	 	 }
-	 	
 	 	 
-	 	 //to check if it is duplicate
 		 Paint errorline = new Paint();
 		 errorline.setColor(Color.RED);
 		 errorline.setStrokeWidth(6);
 		 errorline.setStyle(Paint.Style.STROKE); 
+		 
+	 	 
+	 	 //to check if it is duplicate
 	 	 if(isFill==true){
 	 		if(game.isDuplicate9(selectX, selectY,game.i)){
 	 			if(!game.isOriginal(selectX, selectY)){
-	 				canvas.drawRect(duplicatetRect, errorline);
-					Log.d(" ", "false");
+	 				canvas.drawLine((int)(15+selectX*width), (int)(10+selectY*hight), (int)(12+(selectX+1)*width), (int)(10+(selectY+1)*hight), errorline);
+	 				canvas.drawLine((int)(12+(selectX+1)*width), (int)(10+selectY*hight), (int)(15+selectX*width), (int)(10+(selectY+1)*hight), errorline);
+	 				Log.d(" ", "false");
 	 			}
 		 	 }
 		 	 else {
+			 	 if(!game.isOriginal(selectX, selectY)){
+			 		  canvas.drawRect(selectRect, selected);
+			 	 }
 		 		Log.d(" ", "t");
 			}
 	 	 }
-	 	 /*if(game.isDuplicate9(selectX, selectY,game.i)){
-			 canvas.drawRect(duplicatetRect, errorline);
-			 Log.d(" ", "false");
-	 	 }
-	 	 else {
-	 		Log.d(" ", "t");
-		}*/
-	 	 
-	 	 if(game.isFinished()){
-	 		 if(game.isRight()){
-	 			 
-	 		 }
-	 	 }
-	 	 
+
+		 	if(game.isFinished()){
+		 		Log.d(" ", " finish");
+//		 		 if(game.isRight()){
+//		 			 Paint win=new Paint();
+//		 			 win.setColor(Color.BLUE);
+//		 			 win.setTextSize(hight);
+//		 			 win.setTextAlign(Align.CENTER); 
+//		 			canvas.drawText(winString(),350,300,win); 
+//		 			Log.d(" ", " wiin");
+//		 		 }
+//		 		 else Log.d(" ", " not win");
+		 	 }
+		 	else 
+		 		Log.d("not finish", "yes");
 	 	 //showNumber(selectX, selectY);
 
 		 //canvas.drawRect(selRect, selected); 
@@ -234,6 +265,10 @@ public class Square9View extends View{
 //						
 //		}
 
+		public String winString (){
+			invalidate();
+			return "You Win";
+		}
 
 	
 
