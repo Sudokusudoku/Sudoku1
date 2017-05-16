@@ -15,6 +15,7 @@ public class Game {
 	static int blank;
 	static int[][] now;
 	static int[][] answer;
+	static int[][] wrongPlace=new int[9][9];
 	
 	public Game(){
 		now=getProblemString(str);
@@ -40,7 +41,7 @@ public class Game {
 	
 	//check the duplicates 
 	public boolean isDuplicate9(int i,int j,int x){
-		int equal=0;
+		/*int equal=0;
 		for(int m=0;m<9;m++){
 			//if(now[i][m]%10==x||now[m][j]%10==x||now[i/3*3+m/3][j/3*3+m%3]%10==x) equal++;
 			if(now[i][m]%10==x) equal++;
@@ -48,8 +49,11 @@ public class Game {
 			if(now[i/3*3+m/3][j/3*3+m%3]%10==x) equal++;
 		}
 		if(equal!=3) return true;
+		else return false;*/
+		int[] num=new int[9];
+		num=getUsedNum(i,j);
+		if(num[x-1]==x) return true;
 		else return false;
-		
 	}
 	
 	
@@ -60,7 +64,23 @@ public class Game {
 	
 	//check if the final answer is right after finished
 	public boolean isRight(){
-		return Arrays.equals(now,answer);
+		/*int wrong=0;
+		//return Arrays.equals(now,answer);
+		for(int i=0;i<9;i++){
+			for(int j=0;j<9;j++){
+				if((now[i][j]%10)!=answer[i][j]) wrong++;
+			}
+		}
+		if(wrong==0) return true;
+		else return false;*/
+		int sum=0;
+		for(int i=0;i<9;i++){
+			for(int j=0;j<9;j++){
+				sum=sum+wrongPlace[i][j];
+			}
+		}
+		if(sum==0) return true;
+		else return false;
 	}
 	
 	//decide what to do with the array after the onTouch event
@@ -74,7 +94,12 @@ public class Game {
 	}
 	
 	public boolean isOriginal(int i,int j){
-		if(now[i][j]>0&&now[i][j]<9) return true;
+		if(now[i][j]>0&&now[i][j]<10) return true;
+		else return false;
+	}
+	
+	public boolean isBlank(int i,int j){
+		if(now[i][j]==0) return true;
 		else return false;
 	}
 	
@@ -107,6 +132,73 @@ public class Game {
 ////	public void setNum(int x, int y){
 ////		sudoku[y*9 + x] = i;
 ////	}
+	
+	public int[] getUsedNum(int x,int y){
+		int num[] =new int[9];
+		//get the used number of horizontal direction
+		for(int i=0;i<9;i++){
+			if(i!=y){
+				int number=now[x][i];
+				if(number!=0) num[number%10-1]=number%10;			
+			}
+		}
+		//get the used number of vertical direction
+		for(int i=0;i<9;i++){
+			if(i!=x){
+				int number=now[i][y];
+				if(number!=0) num[number%10-1]=number%10;		
+			}
+		}
+		//get the used number of its square
+		for(int i=0;i<9;i++){
+			if(x/3*3+i/3==x&&y/3*3+i%3==y){
+				continue;
+			}
+			int number=now[x/3*3+i/3][y/3*3+i%3];
+			if(number!=0) num[number%10-1]=number%10;
+		}
+        return num;
+	}
+	
+	//return the candidate number of each blank
+	public String candidate(int x,int y){
+		int num[] =new int[9];
+		num=getUsedNum(x,y);
+		String candidate="";
+		for(int i=0;i<9;i++){
+			if(num[i]==0) candidate=candidate+(i+1);
+		}
+		return candidate;
+	}
+	
+	public int[] hintPlace(){
+		int[] place=new int[2];
+		int length=10;
+		for(int i=0;i<9;i++){
+			for(int j=0;j<9;j++){
+				if(now[i][j]>0){
+					continue;
+				}
+				if(candidate(i,j).length()<length){
+					length=candidate(i,j).length();
+					place[0]=i;
+					place[1]=j;
+				}
+			}
+		}
+		return place;
+	}
+	
+	public void back(){
+		now[Square9View.fillX][Square9View.fillY]=0;
+	}
+	
+	public void wrongPlace(int i,int j,int x){
+		if(isDuplicate9(i,j,x))
+		wrongPlace[i][j]=1;
+	}
+	
+	
 	
 
 	
