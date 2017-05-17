@@ -12,10 +12,9 @@ public class Game {
 
 //	public int sudoku[] = new int[9*9];
 	public static int i;
-	static int blank;
-	static int[][] now;
-	static int[][] answer;
-	static int[][] wrongPlace=new int[9][9];
+	int blank;
+	int[][] now;
+	int[][] wrongPlace=new int[9][9];
 	
 	public Game(){
 		now=getProblemString(str);
@@ -85,10 +84,12 @@ public class Game {
 	
 	//decide what to do with the array after the onTouch event
 	public boolean fill_in_blank(int x,int i,int j){
-		//if(now[i][j]==0) blank--;
-		if(now[i][j]==0||now[i][j]>10){
-			now[i][j]=x+10;
-			return true;
+		if(x>0&&x<10){
+			if(now[i][j]==0||now[i][j]>10){
+				now[i][j]=x+10;
+				return true;
+			}
+			else return false;
 		}
 		else return false;
 	}
@@ -190,12 +191,31 @@ public class Game {
 	}
 	
 	public void back(){
-		now[Square9View.fillX][Square9View.fillY]=0;
+		if(!isOriginal(Square9View.fillX,Square9View.fillY)){
+			now[Square9View.fillX][Square9View.fillY]=0;
+		}
 	}
 	
 	public void wrongPlace(int i,int j,int x){
-		if(isDuplicate9(i,j,x))
-		wrongPlace[i][j]=1;
+		if(isDuplicate9(i,j,x)) {
+			wrongPlace[i][j]=1;
+		}
+		else wrongPlace[i][j]=0;
+		
+	}
+	
+	public boolean isWrong(int i,int j){
+		if(now[i][j]>10){
+			if(isDuplicate9(i,j,now[i][j]-10)){
+				wrongPlace[i][j]=1;
+				return true;
+			}
+			else{
+				wrongPlace[i][j]=0;
+				return false;
+			}
+		}
+		else return false;
 	}
 	
 	

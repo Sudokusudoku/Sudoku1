@@ -4,18 +4,17 @@ import java.util.Arrays;
 
 public class Game4 {
 
-	static int blank4;
-	static int[][] now4;
-	static int[][] answer4;
+	int blank4;
+	int[][] now4;
 	public static int j;
-	static int[][] wrongPlace=new int[4][4];
+	int[][] wrongPlace=new int[4][4];
 	
 	private String str="0020000423000400";
 	private String ansString="4123321423411432";
 	
 	public Game4(){
 		now4=getProblemString(str);
-		answer4=getProblemString(ansString);
+		//answer4=getProblemString(ansString);
 	}
 	
 	public int getNumber(String s){
@@ -73,9 +72,12 @@ public class Game4 {
 	
 	public boolean fill_in_blank(int x,int i,int j){
 		//if(now[i][j]==0) blank--;
-		if(now4[i][j]==0||now4[i][j]>10){
-			now4[i][j]=x+10;
-			return true;
+		if(x>0&&x<10){
+			if(now4[i][j]==0||now4[i][j]>10){
+				now4[i][j]=x+10;
+				return true;
+			}
+			else return false;
 		}
 		else return false;
 	}
@@ -161,8 +163,24 @@ public class Game4 {
 	}
 	
 	public void wrongPlace(int i,int j,int x){
-		if(isDuplicate4(i,j,x))
-		wrongPlace[i][j]=1;
+		if(isDuplicate4(i,j,x)){
+			wrongPlace[i][j]=1;
+		}
+		else wrongPlace[i][j]=0;
 	}
+	public boolean isWrong(int i,int j){
+		if(now4[i][j]>10){
+			if(isDuplicate4(i,j,now4[i][j]-10)){
+				wrongPlace[i][j]=1;
+				return true;
+			}
+			else{
+				wrongPlace[i][j]=0;
+				return false;
+			}
+		}
+		else return false;
+	}
+	
 	
 }

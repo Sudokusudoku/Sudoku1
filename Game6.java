@@ -4,19 +4,18 @@ import java.util.Arrays;
 
 public class Game6 {
 
-	static int blank6;
-	static int[][] now6;
-	static int[][] answer6;
+	int blank6;
+	int[][] now6;
 	
 	public static int k;
-	static int[][] wrongPlace=new int[6][6];
+	int[][] wrongPlace=new int[6][6];
 	
 	private String str="050206246003124065560421400632602010";
 	private String ansString="351246246153124365563421415632632514";
 	
 	public Game6(){
 		now6=getProblemString(str);
-		answer6=getProblemString(ansString);
+		//answer6=getProblemString(ansString);
 	}
 	
 	
@@ -83,10 +82,12 @@ public class Game6 {
 	
 	//decide what to do with the array after the onTouch event
 	public boolean fill_in_blank(int x,int i,int j){
-		//if(now[i][j]==0) blank--;
-		if(now6[i][j]==0||now6[i][j]>10){
-			now6[i][j]=x+10;
-			return true;
+		if(x>0&&x<10){
+			if(now6[i][j]==0||now6[i][j]>10){
+				now6[i][j]=x+10;
+				return true;
+			}
+			else return false;
 		}
 		else return false;
 	}
@@ -152,8 +153,8 @@ public class Game6 {
 	public int[] hintPlace(){
 		int[] place=new int[2];
 		int length=10;
-		for(int i=0;i<9;i++){
-			for(int j=0;j<9;j++){
+		for(int i=0;i<6;i++){
+			for(int j=0;j<6;j++){
 				if(now6[i][j]>0){
 					continue;
 				}
@@ -172,8 +173,24 @@ public class Game6 {
 	}
 	
 	public void wrongPlace(int i,int j,int x){
-		if(isDuplicate6(i,j,x))
-		wrongPlace[i][j]=1;
+		if(isDuplicate6(i,j,x)){
+			wrongPlace[i][j]=1;
+		}
+		else wrongPlace[i][j]=0;
 	}
+	public boolean isWrong(int i,int j){
+		if(now6[i][j]>10){
+			if(isDuplicate6(i,j,now6[i][j]-10)){
+				wrongPlace[i][j]=1;
+				return true;
+			}
+			else{
+				wrongPlace[i][j]=0;
+				return false;
+			}
+		}
+		else return false;
+	}
+	
 	
 }
