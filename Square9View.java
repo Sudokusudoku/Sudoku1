@@ -28,14 +28,16 @@ public class Square9View extends View{
 	}	
 	
 	
-	private Game game=new Game();
+	Game game=new Game();
 	private float width;
 	private float hight;
 	private static int selectX;
 	private static int selectY;
 	private Rect selectRect=new Rect();
 	private Rect duplicatetRect=new Rect();
-	static boolean isFill;
+	boolean isFill=false;
+	public static int fillY;
+	public static int fillX;
 	
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		
@@ -138,23 +140,64 @@ public class Square9View extends View{
 	 	 
 	 	 //to check if it is duplicate
 	 	 if(isFill==true){
-	 		if(game.isDuplicate9(selectX, selectY,game.i)){
-	 			if(!game.isOriginal(selectX, selectY)){
-	 				canvas.drawLine((int)(15+selectX*width), (int)(10+selectY*hight), (int)(12+(selectX+1)*width), (int)(10+(selectY+1)*hight), errorline);
-	 				canvas.drawLine((int)(12+(selectX+1)*width), (int)(10+selectY*hight), (int)(15+selectX*width), (int)(10+(selectY+1)*hight), errorline);
+	 		 		game.wrongPlace(selectX, selectY, game.i);
+//	 				canvas.drawLine((int)(15+selectX*width), (int)(10+selectY*hight), (int)(12+(selectX+1)*width), (int)(10+(selectY+1)*hight), errorline);
+//	 				canvas.drawLine((int)(12+(selectX+1)*width), (int)(10+selectY*hight), (int)(15+selectX*width), (int)(10+(selectY+1)*hight), errorline);
 	 				Log.d(" ", "false");
-	 			}
+	 				if(game.wrongPlace[selectX][selectY]==0)
+	 					 canvas.drawRect(selectRect, selected);
 		 	 }
-		 	 else {
-			 	 if(!game.isOriginal(selectX, selectY)){
-			 		  canvas.drawRect(selectRect, selected);
-			 	 }
-		 		Log.d(" ", "t");
-			}
-	 	 }
 
+	 	 //to show all wrong place
+	 	 for(int i=0;i<9;i++){
+				for(int j=0;j<9;j++){
+					if(game.wrongPlace[i][j]==1){
+						canvas.drawLine((int)(15+i*width), (int)(10+j*hight), (int)(12+(i+1)*width), (int)(10+(j+1)*hight), errorline);
+	 					canvas.drawLine((int)(12+(i+1)*width), (int)(10+j*hight), (int)(15+i*width), (int)(10+(j+1)*hight), errorline);
+						}
+					}
+				}
+	 	 
+//	 	 if(isFill==true){
+//	 		if(game.isDuplicate9(selectX, selectY,game.i)){
+//	 			if(!game.isOriginal(selectX, selectY)){
+//	 				canvas.drawLine((int)(15+selectX*width), (int)(10+selectY*hight), (int)(12+(selectX+1)*width), (int)(10+(selectY+1)*hight), errorline);
+//	 				canvas.drawLine((int)(12+(selectX+1)*width), (int)(10+selectY*hight), (int)(15+selectX*width), (int)(10+(selectY+1)*hight), errorline);
+//	 				Log.d(" ", "false");
+//	 			}
+//		 	 }
+//		 	 else {
+//			 	 if(!game.isOriginal(selectX, selectY)){
+//			 		  canvas.drawRect(selectRect, selected);
+//			 	 }
+//		 		Log.d(" ", "t");
+//			}
+//	 	 }
+	 	 
+	 	 //to show candidate number
+	 	 if(game.candidate==1){
+	 		 Paint candiPaint=new Paint();
+	 		 candiPaint.setColor(Color.BLACK);
+	 		 candiPaint.setTextSize(hight/5);
+			 FontMetrics fm1 = number.getFontMetrics();
+			 
+			 for(int i=0;i<9;i++){
+				for(int j=0;j<9;j++){						
+					canvas.drawText(game.candidate(i, j),i*width+13,(j+1)*hight,candiPaint);			
+				}
+			 }
+	 	 }
+	 	 
+	 	 //to show hint square
+	 	 if(game.candidate==2){
+	 		 selected.setColor(Color.BLUE);
+	 		 int[] hint=new int[2];
+	 		 hint=game.hintPlace();
+	 		 canvas.drawRect((int)(13+hint[0]*width), (int)(10+hint[1]*hight), (int)(13+(hint[0]+1)*width),(int)(13+(hint[1]+1)*hight),selected);
+	 	 }
+	 	 
 		 	if(game.isFinished()){
-		 		Log.d(" ", " finish");
+		 		Log.d(String.valueOf(game.blank), " finish");
 //		 		 if(game.isRight()){
 //		 			 Paint win=new Paint();
 //		 			 win.setColor(Color.BLUE);
@@ -166,7 +209,7 @@ public class Square9View extends View{
 //		 		 else Log.d(" ", " not win");
 		 	 }
 		 	else 
-		 		Log.d("not finish", "yes");
+		 		Log.d("not finish", String.valueOf(game.blank));
 	 	 //showNumber(selectX, selectY);
 
 		 //canvas.drawRect(selRect, selected); 
@@ -223,19 +266,19 @@ public class Square9View extends View{
 		 	 duplicateR(selectX, selectY);
 		 //initiaNum(selectX,selectY);
 		 //game.now[selectX][selectX] = game.i;
-		 isFill=game.fill_in_blank(game.i, selectX, selectY);
+		 if(game.candidate!=4)
+			 isFill=game.fill_in_blank(game.i, selectX, selectY);
+		 if(isFill==true){
+			 fillX=selectX;
+			 fillY=selectY;
+		 }
+			 
 		 Log.d("array", game.getString(selectX, selectY));
 		 //showNumber(selectX, selectY);
 
 
 		 
-//		 Canvas s = null;
-//		 Paint selected = new Paint();
-//		 selected.setColor(Color.CYAN);
-//		 selected.setStrokeWidth(6);
-//		 selected.setStyle(Paint.Style.STROKE); 
-//		 s.drawRect(13 + selectX*width,10+selectY*hight,13+(selectX+1)*width, 10+(selectY+1)*hight,selected);
-//		 		 
+	 		 
 		return true;
 	}
 	 

@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 
 import android.widget.Button;
-import android.widget.LinearLayout;
+
 
 
 public class NineActivity extends Activity {
@@ -23,7 +23,6 @@ public class NineActivity extends Activity {
 	public static int displayWidth;
 	public static int displayHeight;
 
-    
     
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +36,8 @@ public class NineActivity extends Activity {
         displayHeight = displayMetrics.heightPixels;
         
 
-        
+        final Square9View nine=(Square9View)findViewById(R.id.drawView2);
+        game=nine.game;
 
         
         Button[] button=new Button[9];
@@ -64,50 +64,73 @@ public class NineActivity extends Activity {
 			button[i].setWidth(displayWidth/20);
 			button[i].setOnClickListener(listener);
 		}
+		
+		//finish button
 		Button finishB = (Button)findViewById(R.id.buttonFinish);
 		OnClickListener Button_Finish = new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				if(game.isFinished()){
-			 			Log.d(" ", " finish");
-			 			if(game.isRight()){
-			 				showWinDialog();
-			 			}
-			 			else Log.d(" ", " not win");
-			 	 	}
-			 	else 
-			 		Log.d("not finish", "yes");
+		 			Log.d(String.valueOf(game.blank) ,"finish");
+		 			if(game.isRight()){
+		 				showWinDialog();
+		 			}
+		 			else {
+		 				Log.d(" 9", " not win");
+		 				showFailDialog();
+		 			}
+		 	 	}
+		 	else {
+		 		Log.d(String.valueOf(game.blank), "not finish");
+		 		
+		 		showFailDialog();
+		 	}
+			 		
 			}
 		};
 		finishB.setOnClickListener(Button_Finish);
 		
+		//hint button
 		Button hintB = (Button)findViewById(R.id.buttonHint);
 		OnClickListener Button_Hint = new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				
+				nine.invalidate();
+				if(game.candidate!=2)
+					game.candidate=2;
+				else 
+					game.candidate=3;
 			}
 		};
 		hintB.setOnClickListener(Button_Hint);
 		
+		//back button
 		Button backB = (Button)findViewById(R.id.buttonBack);
 		OnClickListener Button_Back = new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				
+				game.back();
+				nine.invalidate();
 			}
 		};
 		backB.setOnClickListener(Button_Back);
 		
+		//on button
 		Button ONB = (Button)findViewById(R.id.buttonON);
 		OnClickListener Button_on = new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				
+				Log.d("click", "on");
+				nine.invalidate();
+				if(game.candidate==0)
+					game.candidate=1;					
+				else 
+					game.candidate=0;
 			}
 		};
 		ONB.setOnClickListener(Button_on);
 		
+		//exit button
 		Button exitB = (Button)findViewById(R.id.buttonExit);
 		OnClickListener Button_Exit = new OnClickListener(){
 			@Override
@@ -118,6 +141,23 @@ public class NineActivity extends Activity {
 		};
 		exitB.setOnClickListener(Button_Exit);
 
+		//Break button
+		Button breakButton = (Button)findViewById(R.id.buttonBreak);
+		OnClickListener Button_Break = new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				if(game.candidate!=4){
+					nine.setVisibility(View.INVISIBLE);
+					Log.d(" pause", " success ");
+					game.candidate=4;
+					
+				}else if (game.candidate==4){
+					nine.setVisibility(View.VISIBLE);
+					game.candidate=5;
+				}
+			}
+		};
+		breakButton.setOnClickListener(Button_Break);
     }
 
     public void showWinDialog(){
@@ -145,7 +185,31 @@ public class NineActivity extends Activity {
         winDialog.show();
    }
 
+    public void showFailDialog(){
 
+        final AlertDialog.Builder failDialog = 
+            new AlertDialog.Builder(NineActivity.this);
+
+        failDialog.setTitle("Game Over");
+        failDialog.setMessage("Sorry,you do not finish! Do you want to continue?");
+        failDialog.setPositiveButton("OK", 
+            new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                
+            }
+        });
+        failDialog.setNegativeButton("NO", 
+            new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+        		Intent intent = new Intent(NineActivity.this, ModeActivity.class);
+        		startActivity(intent);
+            }
+        });
+        failDialog.show();
+    }
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

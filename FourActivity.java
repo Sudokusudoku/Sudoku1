@@ -1,5 +1,6 @@
 package com.example.ssudoku;
 
+import java.text.BreakIterator;
 import java.util.Random;
 
 
@@ -23,24 +24,27 @@ import android.widget.ToggleButton;
 public class FourActivity extends Activity{
 
 	Game4 game=new Game4();
-    @Override
+
+	
+//    public FourActivity(Game4 game2) {
+//		// TODO Auto-generated constructor stub
+//    	game=game2;
+//	}
+
+	@Override
     protected void onCreate(Bundle savedInstanceState) {
     	SysApplication.getInstance().addActivity(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_four);
         
+		final Square4View four=(Square4View)findViewById(R.id.drawView1);
+		game=four.game;
+		
         Button[] button=new Button[4];
         button[0]=(Button)findViewById(R.id.button41);
         button[1]=(Button)findViewById(R.id.button42);
         button[2]=(Button)findViewById(R.id.button43);
         button[3]=(Button)findViewById(R.id.button44);
-
-//        DisplayMetrics metrics = new DisplayMetrics();
-//		this.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-//        LinearLayout.LayoutParams lps = new LinearLayout.LayoutParams(
-//                (int) (metrics.widthPixels * 0.5f + 0.5f),
-//                (int) (metrics.widthPixels  * 0.5f + 0.5f));
-//		button[0].setLayoutParams(lps);
 		
         OnClickListener listener=new OnClickListener() {
 			
@@ -55,50 +59,72 @@ public class FourActivity extends Activity{
 			button[i].setOnClickListener(listener);
 		}
 
+		//finish button
 		Button finishB = (Button)findViewById(R.id.buttonFinish);
 		OnClickListener Button_Finish = new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				if(game.isFinished()){
-			 			Log.d(" ", " finish");
+					Log.d(String.valueOf(game.blank4) ,"finish");
 			 			if(game.isRight()){
 			 				showWinDialog();
 			 			}
-			 			else Log.d(" ", " not win");
+			 			else {
+			 				Log.d(" ", " not win");
+			 				showFailDialog();
+			 			}
 			 	 	}
-			 	else 
-			 		Log.d("not finish", "yes");
+			 	else {
+			 		Log.d(String.valueOf(game.blank4), "not finish");
+			 		showFailDialog();
+			 	}
+			 		
 			}
 		};
 		finishB.setOnClickListener(Button_Finish);
 		
+		//hint button
 		Button hintB = (Button)findViewById(R.id.buttonHint);
 		OnClickListener Button_Hint = new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				
+				four.invalidate();
+				if(game.candidate!=2)
+					game.candidate=2;
+				else 
+					game.candidate=3;
 			}
 		};
 		hintB.setOnClickListener(Button_Hint);
 		
+		//back button
 		Button backB = (Button)findViewById(R.id.buttonBack);
 		OnClickListener Button_Back = new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				
+				game.back();
+				four.invalidate();
 			}
 		};
 		backB.setOnClickListener(Button_Back);
 		
+		//on button
 		Button ONB = (Button)findViewById(R.id.buttonON);
 		OnClickListener Button_on = new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				
+				Log.d("click", "on");
+				four.invalidate();
+				if(game.candidate==0)
+					game.candidate=1;					
+				else 
+					game.candidate=0;
+
 			}
 		};
 		ONB.setOnClickListener(Button_on);
 		
+		//exit button
 		Button exitB = (Button)findViewById(R.id.buttonExit);
 		OnClickListener Button_Exit = new OnClickListener(){
 			@Override
@@ -108,7 +134,27 @@ public class FourActivity extends Activity{
 			}
 		};
 		exitB.setOnClickListener(Button_Exit);
+		
+		//Break button
+		Button breakButton = (Button)findViewById(R.id.buttonBreak);
+		OnClickListener Button_Break = new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				if(game.candidate!=4){
+					four.setVisibility(View.INVISIBLE);
+					Log.d(" pause", " success ");
+					game.candidate=4;
+					
+				}else if (game.candidate==4){
+					four.setVisibility(View.VISIBLE);
+					game.candidate=5;
+				}
+				
+			}
+		};
+		breakButton.setOnClickListener(Button_Break);
 }	
+	
     public void showWinDialog(){
 
         final AlertDialog.Builder winlDialog = 
@@ -123,7 +169,7 @@ public class FourActivity extends Activity{
                 
             }
         });
-        winlDialog.setNegativeButton("back", 
+        winlDialog.setNegativeButton("Back", 
             new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -133,7 +179,32 @@ public class FourActivity extends Activity{
         });
         winlDialog.show();
     }
+    
+    public void showFailDialog(){
 
+        final AlertDialog.Builder failDialog = 
+            new AlertDialog.Builder(FourActivity.this);
+
+        failDialog.setTitle("Game Over");
+        failDialog.setMessage("Sorry,you do not finish! Do you want to continue?");
+        failDialog.setPositiveButton("OK", 
+            new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                
+            }
+        });
+        failDialog.setNegativeButton("NO", 
+            new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+        		Intent intent = new Intent(FourActivity.this, ModeActivity.class);
+        		startActivity(intent);
+            }
+        });
+        failDialog.show();
+    }
+    
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

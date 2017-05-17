@@ -21,6 +21,9 @@ public class SixActivity extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_six);
         
+        final Square6View six=(Square6View)findViewById(R.id.drawView3);
+        game=six.game;
+        
         Button[] button=new Button[6];
         button[0]=(Button)findViewById(R.id.button61);
         button[1]=(Button)findViewById(R.id.button62);
@@ -43,6 +46,7 @@ public class SixActivity extends Activity{
 			button[i].setOnClickListener(listener);
 		}
 		
+		//finish button
 		Button finishB = (Button)findViewById(R.id.buttonFinish);
 		OnClickListener Button_Finish = new OnClickListener(){
 			@Override
@@ -52,41 +56,61 @@ public class SixActivity extends Activity{
 			 			if(game.isRight()){
 			 				showWinDialog();
 			 			}
-			 			else Log.d(" ", " not win");
+			 			else {
+			 				Log.d(" ", " not win");
+			 				showFailDialog();
+			 			}
 			 	 	}
-			 	else 
+			 	else {
 			 		Log.d("not finish", "yes");
+			 		showFailDialog();
+			 	}
+			 		
 			}
 		};
 		finishB.setOnClickListener(Button_Finish);
 		
+		//hint button
 		Button hintB = (Button)findViewById(R.id.buttonHint);
 		OnClickListener Button_Hint = new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				
+				six.invalidate();
+				if(game.candidate!=2)
+					game.candidate=2;
+				else 
+					game.candidate=3;
 			}
 		};
 		hintB.setOnClickListener(Button_Hint);
 		
+		//back button
 		Button backB = (Button)findViewById(R.id.buttonBack);
 		OnClickListener Button_Back = new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				
+				game.back();
+				six.invalidate();
 			}
 		};
 		backB.setOnClickListener(Button_Back);
 		
+		//on button
 		Button ONB = (Button)findViewById(R.id.buttonON);
 		OnClickListener Button_on = new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				
+				Log.d("click", "on");
+				six.invalidate();
+				if(game.candidate==0)
+					game.candidate=1;					
+				else 
+					game.candidate=0;
 			}
 		};
 		ONB.setOnClickListener(Button_on);
 		
+		//exit button
 		Button exitB = (Button)findViewById(R.id.buttonExit);
 		OnClickListener Button_Exit = new OnClickListener(){
 			@Override
@@ -97,23 +121,40 @@ public class SixActivity extends Activity{
 		};
 		exitB.setOnClickListener(Button_Exit);
 
-    }
+		//Break button
+		Button breakButton = (Button)findViewById(R.id.buttonBreak);
+		OnClickListener Button_Break = new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				if(game.candidate!=4){
+					six.setVisibility(View.INVISIBLE);
+					Log.d(" pause", " success ");
+					game.candidate=4;
+					
+				}else if (game.candidate==4){
+					six.setVisibility(View.VISIBLE);
+					game.candidate=5;
+				}
+			}
+		};
+		breakButton.setOnClickListener(Button_Break);
+ }
 
     public void showWinDialog(){
 
-        final AlertDialog.Builder winlDialog = 
+        final AlertDialog.Builder winDialog = 
             new AlertDialog.Builder(SixActivity.this);
 
-        winlDialog.setTitle("Game Over");
-        winlDialog.setMessage("Congratulations!You Win!");
-        winlDialog.setPositiveButton("OK", 
+        winDialog.setTitle("Game Over");
+        winDialog.setMessage("Congratulations!You Win!");
+        winDialog.setPositiveButton("OK", 
             new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 
             }
         });
-        winlDialog.setNegativeButton("back", 
+        winDialog.setNegativeButton("back", 
             new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -121,8 +162,34 @@ public class SixActivity extends Activity{
         		startActivity(intent);
             }
         });
-        winlDialog.show();
+        winDialog.show();
+   }
+
+    public void showFailDialog(){
+
+        final AlertDialog.Builder failDialog = 
+            new AlertDialog.Builder(SixActivity.this);
+
+        failDialog.setTitle("Game Over");
+        failDialog.setMessage("Sorry,you do not finish! Do you want to continue?");
+        failDialog.setPositiveButton("OK", 
+            new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                
+            }
+        });
+        failDialog.setNegativeButton("NO", 
+            new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+        		Intent intent = new Intent(SixActivity.this, ModeActivity.class);
+        		startActivity(intent);
+            }
+        });
+        failDialog.show();
     }
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -142,4 +209,3 @@ public class SixActivity extends Activity{
         return super.onOptionsItemSelected(item);
     }
 }
-

@@ -1,6 +1,9 @@
 package com.example.ssudoku;
 
+import android.R.integer;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -11,7 +14,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.MeasureSpec;
 
 
 
@@ -28,14 +30,17 @@ public class Square6View extends View{
 	}	
 	
 	
-	private Game6 game=new Game6();
+	public Game6 game=new Game6();
+
 	private float width;
 	private float hight;
 	private static int selectX;
 	private static int selectY;
 	private Rect selectRect=new Rect();
 	private Rect duplicatetRect=new Rect();
-	static boolean isFill;
+	boolean isFill=false;
+	public static int fillX;
+	public static int fillY;
 	
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		
@@ -46,28 +51,28 @@ public class Square6View extends View{
 		System.out.print("hhhh");
 	}
 	
-	 protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-	        setMeasuredDimension(   measureWidth(widthMeasureSpec), 
-	        		measureWidth(widthMeasureSpec)+10);
-	    }
-		 
-	 private int measureWidth(int measureSpec) {    
-	        int w = 0;
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        setMeasuredDimension(   measureWidth(widthMeasureSpec), 
+        		measureWidth(widthMeasureSpec)+30);
+    }
+	 
+    private int measureWidth(int measureSpec) {    
+        int w = 0;
 
-	        int specMode = MeasureSpec.getMode(measureSpec);
-	        int specSize = MeasureSpec.getSize(measureSpec);
+        int specMode = MeasureSpec.getMode(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
 
-	        if (specMode == MeasureSpec.EXACTLY) {   // match_parent , accurate
-	            w = specSize;
-	        } else {
-	            w =600 ;    
-	            if (specMode == MeasureSpec.AT_MOST) {  // wrap_content 
-	               w = Math.min(w,specSize); //注意取两者之间小的值 
-	           }
-	        }
-	        return w;
-	    }
-	    
+        if (specMode == MeasureSpec.EXACTLY) {   // match_parent , accurate
+            w = specSize;
+        } else {
+            w = 600;    
+            if (specMode == MeasureSpec.AT_MOST) {  // wrap_content 
+               w = Math.min(w,specSize); 
+           }
+        }
+        return w;
+    }
+    
 	 public void onDraw(Canvas canvas){
 		 
 		 
@@ -103,13 +108,7 @@ public class Square6View extends View{
 			 }
 		 }
 		 
-//		 for(int j=0;j<6;j++){
-//			 if(j%3==0){
-//				 canvas.drawLine(13, 10+j*hight, getWidth()-13, 10+j*hight, darkline);
-//				 canvas.drawLine(13+j*width, 10, 13+j*width , getWidth()-16, darkline); 
-//			 }
-//		 }
-		
+
 		 //draw initial numbers
 		 Paint iniBackPaint=new Paint();
 		 iniBackPaint.setColor(Color.argb(85,107,47,0));
@@ -126,14 +125,14 @@ public class Square6View extends View{
 			for(int j=0;j<6;j++){
 				if( game.now6[i][j]>0 && game.now6[i][j]<10)
 					canvas.drawRect((int)(14+i*width), (int)(11+j*hight), (int)(12+(i+1)*width),(int)(10+(j+1)*hight),iniBackPaint);				
-				canvas.drawText(game.getString(i, j),i*width+x,j*hight+y,number);
+				canvas.drawText(game.getString(i, j),i*width+x,j*hight+y,number);			
 			}
 		 }
 		 
-		//draw selected area
+		 //draw selected area
 		 Paint selected = new Paint();
 	 	 selected.setColor(Color.argb(107,142,35,0));
-	 	 selected.setStrokeWidth(6);
+	 	 selected.setStrokeWidth(10);
 	 	 selected.setStyle(Paint.Style.STROKE); 
 	 	 
 		 Paint errorline = new Paint();
@@ -144,33 +143,59 @@ public class Square6View extends View{
 	 	 
 	 	 //to check if it is duplicate
 	 	 if(isFill==true){
-	 		if(game.isDuplicate6(selectX, selectY,game.k)){
-	 			if(!game.isOriginal(selectX, selectY)){
-	 				canvas.drawLine((int)(15+selectX*width), (int)(10+selectY*hight), (int)(12+(selectX+1)*width), (int)(10+(selectY+1)*hight), errorline);
-	 				canvas.drawLine((int)(12+(selectX+1)*width), (int)(10+selectY*hight), (int)(15+selectX*width), (int)(10+(selectY+1)*hight), errorline);
+	 		 		//game.wrongPlace(selectX, selectY, game.j);
+//	 				canvas.drawLine((int)(15+selectX*width), (int)(10+selectY*hight), (int)(12+(selectX+1)*width), (int)(10+(selectY+1)*hight), errorline);
+//	 				canvas.drawLine((int)(12+(selectX+1)*width), (int)(10+selectY*hight), (int)(15+selectX*width), (int)(10+(selectY+1)*hight), errorline);
 	 				Log.d(" ", "false");
-	 			}
+	 				if(game.wrongPlace[selectX][selectY]==0)
+	 					 canvas.drawRect(selectRect, selected);
 		 	 }
-		 	 else {
-			 	 if(!game.isOriginal(selectX, selectY)){
-			 		  canvas.drawRect(selectRect, selected);
-			 	 }
-		 		Log.d(" ", "t");
-			}
+
+	 	 //to show all wrong place
+	 	 for(int i=0;i<6;i++){
+				for(int j=0;j<6;j++){
+					if(game.isWrong(i, j)){
+						canvas.drawLine((int)(15+i*width), (int)(10+j*hight), (int)(12+(i+1)*width), (int)(10+(j+1)*hight), errorline);
+	 					canvas.drawLine((int)(12+(i+1)*width), (int)(10+j*hight), (int)(15+i*width), (int)(10+(j+1)*hight), errorline);
+						}
+					}
+				}
+
+	 	 //to show candidate number
+	 	 if(game.candidate==1){
+	 		 Paint candiPaint=new Paint();
+	 		 candiPaint.setColor(Color.BLACK);
+	 		 candiPaint.setTextSize(hight/5);
+			 FontMetrics fm1 = number.getFontMetrics();
+			 
+			 for(int i=0;i<6;i++){
+				for(int j=0;j<6;j++){	
+					if(game.isBlank(i, j))
+						canvas.drawText(game.candidate(i, j),i*width+13,(j+1)*hight,candiPaint);			
+				}
+			 }
+	 	 }
+	 	
+	 	 //to show hint square
+	 	 if(game.candidate==2){
+	 		 selected.setColor(Color.BLUE);
+	 		 int[] hint=new int[2];
+	 		 hint=game.hintPlace();
+	 		 canvas.drawRect((int)(13+hint[0]*width), (int)(10+hint[1]*hight), (int)(13+(hint[0]+1)*width),(int)(13+(hint[1]+1)*hight),selected);
 	 	 }
 	 	 
-	 	//to check if win
-	 	if(game.isFinished()){
+	 	 
+	 	 if(game.isFinished()){
 	 		Log.d(" ", " finish");
 	 		 if(game.isRight()){
-	 			Log.d(" ", " wiin");
+	 			Log.d(" ", " win");
 	 		 }
-	 		 else {
-	 			 Log.d(" ", " not win");
-	 		 }
+	 		 else Log.d(" ", " not win");
 	 	 }
 	 	else 
 	 		Log.d("not finish", "yes");
+	 	 
+
 		 
 	 	 	 	 
 		super.onDraw(canvas); 
@@ -191,15 +216,22 @@ public class Square6View extends View{
 		 if(clickY>10&&clickY<getWidth()-16)
 			 selectedR(selectX, selectY);
 		 	 duplicateR(selectX, selectY);
-
-		 isFill=game.fill_in_blank(game.k, selectX, selectY);
+		 //initiaNum(selectX,selectY);
+		 //game.now[selectX][selectX] = game.i;
+		 if(game.candidate!=4)
+			 isFill=game.fill_in_blank(game.k, selectX, selectY);
+		 if(isFill==true){
+			 fillX=selectX;
+			 fillY=selectY;
+		 }
 		 Log.d("array", game.getString(selectX, selectY));
-		 		 
+		 //showNumber(selectX, selectY);
+				
 		return true;
 	}
 	 
 
-	 
+
 
 		public void selectedR(int x,int y){
 			invalidate(selectRect);
@@ -214,10 +246,6 @@ public class Square6View extends View{
 		}
 		
 
-		public String winString (){
-			invalidate();
-			return "You Win";
-		}
 
 
 	

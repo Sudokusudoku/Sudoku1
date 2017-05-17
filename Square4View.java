@@ -1,8 +1,11 @@
 package com.example.ssudoku;
 
+import android.R.integer;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -29,15 +32,18 @@ public class Square4View extends View{
 	}	
 	
 	
-	private Game4 game=new Game4();
+	public Game4 game=new Game4();
+
 	private float width;
 	private float hight;
 	private static int selectX;
 	private static int selectY;
 	private Rect selectRect=new Rect();
 	private Rect duplicatetRect=new Rect();
-	static boolean isFill;
-	int status;
+	boolean isFill=false;
+	public static int fillX;
+	public static int fillY;
+	
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		
 		this.width =( w-26) / 4f;
@@ -63,7 +69,7 @@ public class Square4View extends View{
         } else {
             w = 600;    
             if (specMode == MeasureSpec.AT_MOST) {  // wrap_content 
-               w = Math.min(w,specSize); //注意取两者之间小的值 
+               w = Math.min(w,specSize);
            }
         }
         return w;
@@ -116,14 +122,17 @@ public class Square4View extends View{
 		 FontMetrics fm = number.getFontMetrics();
 		 float x=13+width/2;
 		 float y=10+hight/2 - (fm.ascent+fm.descent)/2;
-		 
-		 for(int i=0;i<4;i++){
-			for(int j=0;j<4;j++){
-				if( game.now4[i][j]>0 && game.now4[i][j]<10)
-					canvas.drawRect((int)(14+i*width), (int)(11+j*hight), (int)(12+(i+1)*width),(int)(10+(j+1)*hight),iniBackPaint);				
-				canvas.drawText(game.getString(i, j),i*width+x,j*hight+y,number);			
+		
+
+			for(int i=0;i<4;i++){
+				for(int j=0;j<4;j++){
+					if( game.now4[i][j]>0 && game.now4[i][j]<10)
+						canvas.drawRect((int)(14+i*width), (int)(11+j*hight), (int)(12+(i+1)*width),(int)(10+(j+1)*hight),iniBackPaint);				
+					canvas.drawText(game.getString(i, j),i*width+x,j*hight+y,number);			
+				}
 			}
-		 }
+
+
 		 
 		 //draw selected area
 		 Paint selected = new Paint();
@@ -139,41 +148,65 @@ public class Square4View extends View{
 	 	 
 	 	 //to check if it is duplicate
 	 	 if(isFill==true){
-	 		if(game.isDuplicate4(selectX, selectY,game.j)){
-	 			if(!game.isOriginal(selectX, selectY)){
-	 				canvas.drawLine((int)(15+selectX*width), (int)(10+selectY*hight), (int)(12+(selectX+1)*width), (int)(10+(selectY+1)*hight), errorline);
-	 				canvas.drawLine((int)(12+(selectX+1)*width), (int)(10+selectY*hight), (int)(15+selectX*width), (int)(10+(selectY+1)*hight), errorline);
+	 		 		//game.wrongPlace(selectX, selectY, game.j);
+//	 				canvas.drawLine((int)(15+selectX*width), (int)(10+selectY*hight), (int)(12+(selectX+1)*width), (int)(10+(selectY+1)*hight), errorline);
+//	 				canvas.drawLine((int)(12+(selectX+1)*width), (int)(10+selectY*hight), (int)(15+selectX*width), (int)(10+(selectY+1)*hight), errorline);
 	 				Log.d(" ", "false");
-	 			}
+	 				if(game.wrongPlace[selectX][selectY]==0&&game.candidate!=4)
+	 					 canvas.drawRect(selectRect, selected);
 		 	 }
-		 	 else {
-			 	 if(!game.isOriginal(selectX, selectY)){
-			 		  canvas.drawRect(selectRect, selected);
-			 	 }
-		 		Log.d(" ", "t");
-			}
+
+	 	 //to show all wrong place
+	 	 for(int i=0;i<4;i++){
+				for(int j=0;j<4;j++){
+					if(game.isWrong(i, j)){
+						canvas.drawLine((int)(15+i*width), (int)(10+j*hight), (int)(12+(i+1)*width), (int)(10+(j+1)*hight), errorline);
+	 					canvas.drawLine((int)(12+(i+1)*width), (int)(10+j*hight), (int)(15+i*width), (int)(10+(j+1)*hight), errorline);
+						}
+					}
+				}
+
+	 	 //to show candidate number
+	 	 if(game.candidate==1){
+	 		 Paint candiPaint=new Paint();
+	 		 candiPaint.setColor(Color.BLACK);
+	 		 candiPaint.setTextSize(hight/5);
+			 FontMetrics fm1 = number.getFontMetrics();
+			 
+			 for(int i=0;i<4;i++){
+				for(int j=0;j<4;j++){	
+					if(game.isBlank(i, j))
+						canvas.drawText(game.candidate(i, j),i*width+13,(j+1)*hight,candiPaint);			
+				}
+			 }
 	 	 }
-	 	 /*if(game.isDuplicate9(selectX, selectY,game.i)){
-			 canvas.drawRect(duplicatetRect, errorline);
-			 Log.d(" ", "false");
-	 	 }
-	 	 else {
-	 		Log.d(" ", "t");
-		}*/
 	 	
+	 	 //to show hint square
+	 	 if(game.candidate==2){
+	 		 selected.setColor(Color.BLUE);
+	 		 int[] hint=new int[2];
+	 		 hint=game.hintPlace();
+	 		 canvas.drawRect((int)(13+hint[0]*width), (int)(10+hint[1]*hight), (int)(13+(hint[0]+1)*width),(int)(13+(hint[1]+1)*hight),selected);
+	 	 }
+
+	 	 //to show break situation
+//	 	 Bitmap breakBitmap= BitmapFactory.decodeResource(getResources(), R.drawable.d);
+//	 	 if(game.candidate==4){
+//	 		canvas.drawBitmap(breakBitmap,13 ,10, background);
+//
+//	 	 }
+	 		 
+	 	 
 	 	 if(game.isFinished()){
 	 		Log.d(" ", " finish");
 	 		 if(game.isRight()){
-	 			Log.d(" ", " wiin");
+	 			Log.d(" ", " win");
 	 		 }
 	 		 else Log.d(" ", " not win");
 	 	 }
 	 	else 
-	 		Log.d("not finish", "yes");
-	 	 
-
-		 
-	 	 	 	 
+	 		Log.d("not finish", String.valueOf(game.blank4));
+	 	 	 	 	 
 		super.onDraw(canvas); 
 		 
 	 }
@@ -194,10 +227,16 @@ public class Square4View extends View{
 		 	 duplicateR(selectX, selectY);
 		 //initiaNum(selectX,selectY);
 		 //game.now[selectX][selectX] = game.i;
-		 isFill=game.fill_in_blank(game.j, selectX, selectY);
+		 
+		 if(game.candidate!=4)
+		 	 isFill=game.fill_in_blank(game.j, selectX, selectY);
+		 if(isFill==true){
+			 fillX=selectX;
+			 fillY=selectY;
+		 }
 		 Log.d("array", game.getString(selectX, selectY));
 		 //showNumber(selectX, selectY);
-
+				
 		return true;
 	}
 	 
@@ -216,10 +255,7 @@ public class Square4View extends View{
 			invalidate(duplicatetRect);
 		}
 		
-		public String winString (){
-			invalidate();
-			return "You Win";
-		}
+
 
 
 	
