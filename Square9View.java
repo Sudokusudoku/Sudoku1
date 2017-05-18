@@ -182,7 +182,8 @@ public class Square9View extends View{
 			 FontMetrics fm1 = number.getFontMetrics();
 			 
 			 for(int i=0;i<9;i++){
-				for(int j=0;j<9;j++){						
+				for(int j=0;j<9;j++){	
+					if(game.isBlank(i, j))
 					canvas.drawText(game.candidate(i, j),i*width+13,(j+1)*hight,candiPaint);			
 				}
 			 }
