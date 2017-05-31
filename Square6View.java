@@ -123,9 +123,9 @@ public class Square6View extends View{
 		 
 		 for(int i=0;i<6;i++){
 			for(int j=0;j<6;j++){
-				if( game.now6[i][j]>0 && game.now6[i][j]<10)
+				if( game.now6[j][i]>0 && game.now6[j][i]<10)
 					canvas.drawRect((int)(14+i*width), (int)(11+j*hight), (int)(12+(i+1)*width),(int)(10+(j+1)*hight),iniBackPaint);				
-				canvas.drawText(game.getString(i, j),i*width+x,j*hight+y,number);			
+				canvas.drawText(game.getString(j, i),i*width+x,j*hight+y,number);			
 			}
 		 }
 		 
@@ -147,14 +147,14 @@ public class Square6View extends View{
 //	 				canvas.drawLine((int)(15+selectX*width), (int)(10+selectY*hight), (int)(12+(selectX+1)*width), (int)(10+(selectY+1)*hight), errorline);
 //	 				canvas.drawLine((int)(12+(selectX+1)*width), (int)(10+selectY*hight), (int)(15+selectX*width), (int)(10+(selectY+1)*hight), errorline);
 	 				Log.d(" ", "false");
-	 				if(game.wrongPlace[selectX][selectY]==0)
+	 				if(game.wrongPlace[selectY][selectX]==0)
 	 					 canvas.drawRect(selectRect, selected);
 		 	 }
 
 	 	 //to show all wrong place
 	 	 for(int i=0;i<6;i++){
 				for(int j=0;j<6;j++){
-					if(game.isWrong(i, j)){
+					if(game.isWrong(j, i)){
 						canvas.drawLine((int)(15+i*width), (int)(10+j*hight), (int)(12+(i+1)*width), (int)(10+(j+1)*hight), errorline);
 	 					canvas.drawLine((int)(12+(i+1)*width), (int)(10+j*hight), (int)(15+i*width), (int)(10+(j+1)*hight), errorline);
 						}
@@ -170,8 +170,8 @@ public class Square6View extends View{
 			 
 			 for(int i=0;i<6;i++){
 				for(int j=0;j<6;j++){	
-					if(game.isBlank(i, j))
-						canvas.drawText(game.candidate(i, j),i*width+13,(j+1)*hight,candiPaint);			
+					if(game.isBlank(j, i))
+						canvas.drawText(game.candidate(j, i),i*width+13,(j+1)*hight,candiPaint);			
 				}
 			 }
 	 	 }
@@ -181,7 +181,7 @@ public class Square6View extends View{
 	 		 selected.setColor(Color.BLUE);
 	 		 int[] hint=new int[2];
 	 		 hint=game.hintPlace();
-	 		 canvas.drawRect((int)(13+hint[0]*width), (int)(10+hint[1]*hight), (int)(13+(hint[0]+1)*width),(int)(13+(hint[1]+1)*hight),selected);
+	 		 canvas.drawRect((int)(13+hint[1]*width), (int)(10+hint[0]*hight), (int)(13+(hint[1]+1)*width),(int)(13+(hint[0]+1)*hight),selected);
 	 	 }
 	 	 
 	 	 
@@ -219,7 +219,7 @@ public class Square6View extends View{
 		 //initiaNum(selectX,selectY);
 		 //game.now[selectX][selectX] = game.i;
 		 if(game.candidate!=4)
-			 isFill=game.fill_in_blank(game.k, selectX, selectY);
+			 isFill=game.fill_in_blank(game.k, selectY, selectX);
 		 if(isFill==true){
 			 fillX=selectX;
 			 fillY=selectY;
