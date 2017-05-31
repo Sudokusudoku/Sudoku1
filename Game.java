@@ -191,8 +191,8 @@ public class Game {
 	}
 	
 	public void back(){
-		if(!isOriginal(Square9View.fillX,Square9View.fillY)){
-			now[Square9View.fillX][Square9View.fillY]=0;
+		if(!isOriginal(Square9View.fillY,Square9View.fillX)){
+			now[Square9View.fillY][Square9View.fillX]=0;
 		}
 	}
 	
