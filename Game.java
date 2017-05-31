@@ -108,7 +108,7 @@ public class Game {
 		int[][] sudo = new int[9][9];
 		for(int i=0;i<9;i++){
 			for(int j=0;j<9;j++){
-				 sudo[i][j]=s.charAt(9*j+i)- '0';
+				 sudo[i][j]=s.charAt(9*i+j)- '0';
 			}			 
 		}
 
