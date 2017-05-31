@@ -105,7 +105,7 @@ public class Game6 {
 		int[][] sudo = new int[6][6];
 		for(int i=0;i<6;i++){
 			for(int j=0;j<6;j++){
-				 sudo[i][j]=s.charAt(6*j+i)- '0';
+				 sudo[i][j]=s.charAt(6*i+j)- '0';
 			}			 
 		}
 		return sudo;
@@ -169,7 +169,9 @@ public class Game6 {
 	}
 	
 	public void back(){
-		now6[Square6View.fillX][Square6View.fillY]=0;
+		if(isOriginal(Square6View.fillY, Square6View.fillX)){
+			now6[Square6View.fillY][Square6View.fillX]=0;
+		}
 	}
 	
 	public void wrongPlace(int i,int j,int x){
