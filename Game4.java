@@ -159,7 +159,7 @@ public class Game4 {
 	}
 	
 	public void back(){
-		now4[Square4View.fillX][Square4View.fillY]=0;
+		now4[Square4View.fillY][Square4View.fillX]=0;
 	}
 	
 	public void wrongPlace(int i,int j,int x){
