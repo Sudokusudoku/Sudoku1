@@ -106,13 +106,14 @@
                 android:background="@drawable/a"
                 android:text="@string/hint" />
            
-            <Button
+            <ToggleButton
                 android:id="@+id/buttonON"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/drawView2"
                 android:layout_toRightOf="@+id/buttonHint"
                 android:background="@drawable/a"
+	        android:checked="true"
                 android:text="@string/on" />
                       
               <Button
